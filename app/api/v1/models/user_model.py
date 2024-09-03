@@ -20,14 +20,23 @@ class UserModel(BaseModel):
         from_attributes = True
 
 
-class UserRequestModel(BaseModel):
-    """Модель данных для запроса основной информации об пользователе"""
+class UserCreateRequestModel(BaseModel):
+    """Модель данных для запроса на создание пользователя"""
 
-    ...
+    name: str = Field(...)
+    sur_name: str | None = Field(default=None)
+    birth_date: datetime.date | None = Field(default=None)
+    sex: SexEnum | None = Field(default=None)
+    city: str | None = Field(default=None)
+    interest: str | None = Field(default=None)
 
 
 class UserResponseModel(UserModel):
     id: int = Field(exclude=True)
+
+
+class UserCreateResponseModel(BaseModel):
+    id: int | None
 
 
 class UsersResponseModel(RootModel):

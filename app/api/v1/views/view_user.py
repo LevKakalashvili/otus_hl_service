@@ -3,10 +3,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.api.v1.controllers import UserController
-from app.api.v1.models import UserModel, UserResponseModel, UsersResponseModel
+from app.api.v1.models import (
+    UserCreateResponseModel,
+    UserModel,
+    UserResponseModel,
+    UsersResponseModel,
+)
 from app.core.based import NotFoundResponse
 
-user_router = APIRouter(tags=["user"], prefix="/user")
+user_router = APIRouter(
+    tags=["User"],
+    prefix="/user",
+)
 
 
 @user_router.get(
@@ -25,7 +33,7 @@ async def get_user_info(
 
 
 @user_router.get(
-    "/",
+    "",
     responses=NotFoundResponse,
     summary="Запрос информации о всех пользователях",
 )
@@ -38,3 +46,17 @@ async def get_all_user_info(
     return UsersResponseModel.model_validate(
         [UserResponseModel.model_validate(element) for element in info]
     )
+
+
+@user_router.post(
+    "",
+    responses=NotFoundResponse,
+    summary="Создание пользователя",
+)
+async def create_user_info(
+    id_: Annotated[
+        int,
+        Depends(UserController.create_user),
+    ]
+) -> UserCreateResponseModel:
+    return UserCreateResponseModel(id=id_)

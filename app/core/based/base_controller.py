@@ -9,13 +9,30 @@ class BaseController:
     """
 
     @staticmethod
+    async def create(
+        session: AsyncSession,
+        model: str,
+        data: dict,
+    ) -> int:
+        if isinstance(data, dict) and data:
+            query = (
+                f"INSERT INTO {model} "
+                f"({", ".join([f'"{key}"' for key in data.keys()])}) "
+                f"VALUES "
+                f"({", ".join([f"'{value}'"for value in data.values()])}) "
+                f"RETURNING id"
+            )
+            item = await session.execute(text(query))
+        return list(item)[0][0]
+
+    @staticmethod
     async def get_by_id(
         session: AsyncSession,
         model: str,
-        id: int,
+        id_: int,
         detail_by_not_fount: str = "Not found.",
     ) -> object:
-        item = await session.execute(text(f"SELECT * FROM {model} WHERE id={id}"))
+        item = await session.execute(text(f"SELECT * FROM {model} WHERE id={id_}"))
         if not (item := item.first()):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=detail_by_not_fount

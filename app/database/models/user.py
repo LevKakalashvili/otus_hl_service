@@ -14,7 +14,7 @@ class User(BaseModel):
     __tablename__ = "user"
 
     name: Mapped[str] = mapped_column(
-        String(255), comment="Иям пользователя", nullable=False
+        String(255), comment="Имя пользователя", nullable=False, unique=True
     )
     sur_name: Mapped[str] = mapped_column(
         String(255), comment="Фамилия пользователя", nullable=True

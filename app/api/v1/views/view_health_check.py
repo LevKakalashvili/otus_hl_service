@@ -9,7 +9,7 @@ from starlette.status import HTTP_200_OK, HTTP_503_SERVICE_UNAVAILABLE
 from app.core.settings import Settings
 from app.database.db import get_session
 
-health_check_router = APIRouter(tags=["HealthChecks"])
+health_check_router = APIRouter(tags=["Health Checks"])
 
 
 @health_check_router.get(

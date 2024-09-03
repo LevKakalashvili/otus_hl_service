@@ -1,6 +1,7 @@
 from .user_model import (
+    UserCreateRequestModel,
+    UserCreateResponseModel,
     UserModel,
-    UserRequestModel,
     UserResponseModel,
     UsersResponseModel,
 )
@@ -9,5 +10,6 @@ __all__ = [
     "UserModel",
     "UserResponseModel",
     "UsersResponseModel",
-    "UserRequestModel",
+    "UserCreateRequestModel",
+    "UserCreateResponseModel",
 ]

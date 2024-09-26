@@ -14,13 +14,16 @@ class BaseController:
         model: str,
         data: dict,
     ) -> int:
+        # INSERT INTO public."user"
+        # ("name", sur_name, birth_date, sex, city, interest, id)
+        # VALUES('Иван', 'Иванов', '2000-01-01', NULL, 'Sarov', 'cats, pets, football', 1);
         if isinstance(data, dict) and data:
             query = (
-                f"INSERT INTO {model} "
-                f"({", ".join([f'"{key}"' for key in data.keys()])}) "
-                f"VALUES "
-                f"({", ".join([f"'{value}'"for value in data.values()])}) "
-                f"RETURNING id"
+                f"INSERT INTO {model} ("
+                + ", ".join(['"' + key_ + '"' for key_ in data.keys()])
+                + ") VALUES ("
+                + ", ".join("'" + str(value) + "'" for value in data.values())
+                + ") RETURNING id"
             )
             item = await session.execute(text(query))
         return list(item)[0][0]
@@ -44,5 +47,19 @@ class BaseController:
         session: AsyncSession, model: str, detail_by_not_fount: str = "Not found."
     ) -> list[object]:
         items = await session.execute(text(f"SELECT * FROM {model}"))
+        items = items.all()
+        return items if len(items) > 1 else []
+
+    @staticmethod
+    async def search(
+        session: AsyncSession,
+        model: str,
+        data: dict,
+        detail_by_not_fount: str = "Not found.",
+    ) -> list[object]:
+        query = query = f"SELECT * FROM {model} WHERE " + " AND ".join(
+            f"{key} ilike '{str(value)}%'" for key, value in data.items()
+        )
+        items = await session.execute(text(query))
         items = items.all()
         return items if len(items) > 1 else []

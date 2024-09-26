@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.core.settings import settings
 from app.database import Base
 from app.database.models import *
+import alembic_postgresql_enum
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -50,6 +51,7 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+    print(f"==================> {url}")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -73,7 +75,7 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
-
+    print(f"==================> run_async_migrations")
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

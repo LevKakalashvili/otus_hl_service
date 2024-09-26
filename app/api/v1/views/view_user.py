@@ -12,9 +12,25 @@ from app.api.v1.models import (
 from app.core.based import NotFoundResponse
 
 user_router = APIRouter(
-    tags=["User"],
+    tags=["Пользователи"],
     prefix="/user",
 )
+
+
+@user_router.get(
+    "/search",
+    responses=NotFoundResponse,
+    summary="Поиск пользователя по имени и фамилии",
+)
+async def search_user_info(
+    info: Annotated[
+        list[UserModel],
+        Depends(UserController.search_users_info),
+    ]
+) -> UsersResponseModel:
+    return UsersResponseModel.model_validate(
+        [UserResponseModel.model_validate(element) for element in info]
+    )
 
 
 @user_router.get(

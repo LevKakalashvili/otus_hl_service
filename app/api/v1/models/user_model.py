@@ -1,6 +1,7 @@
 import datetime
 
-from pydantic import BaseModel, Field, RootModel
+from fastapi import Query
+from pydantic import BaseModel, Field, RootModel, field_serializer
 
 from app.database.models import SexEnum
 
@@ -20,6 +21,13 @@ class UserModel(BaseModel):
         from_attributes = True
 
 
+class UserSearchRequestModel(BaseModel):
+    """Модель данных для запроса на поиск пользователей"""
+
+    name: str | None = Field(Query(default=None, example="Ива"))
+    sur_name: str | None = Field(Query(default=None, example="Иван"))
+
+
 class UserCreateRequestModel(BaseModel):
     """Модель данных для запроса на создание пользователя"""
 
@@ -29,6 +37,10 @@ class UserCreateRequestModel(BaseModel):
     sex: SexEnum | None = Field(default=None)
     city: str | None = Field(default=None)
     interest: str | None = Field(default=None)
+
+    @field_serializer("sex")
+    def serialize_group(self, sex: sex, _info):
+        return sex.name.lower()
 
 
 class UserResponseModel(UserModel):

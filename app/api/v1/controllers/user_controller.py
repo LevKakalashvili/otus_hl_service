@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.models import UserCreateRequestModel, UserModel
+from app.api.v1.models.user_model import UserSearchRequestModel
 from app.core.based import BaseController
 from app.database.db import get_session
 from app.database.models import User
@@ -9,6 +10,19 @@ from app.database.models import User
 
 class UserController(BaseController):
     model = f'"{User.__tablename__}"'
+
+    @staticmethod
+    async def search_users_info(
+        user_info: UserSearchRequestModel = Depends(),
+        session: AsyncSession = Depends(get_session),
+    ) -> list[UserModel]:
+        """Метод поиск пользователей"""
+        info = await UserController.search(
+            session=session,
+            model=UserController.model,
+            data=user_info.model_dump(exclude_none=True),
+        )
+        return [UserModel.model_validate(element) for element in info]
 
     @staticmethod
     async def create_user(
@@ -26,7 +40,7 @@ class UserController(BaseController):
     async def get_user_info(
         user_id: int, session: AsyncSession = Depends(get_session)
     ) -> UserModel:
-        """Метод получения информации о пользователе по его ид"""
+        """Метод получения информации о пользователе по его id"""
         info = await UserController.get_by_id(
             session=session, id_=user_id, model=UserController.model
         )

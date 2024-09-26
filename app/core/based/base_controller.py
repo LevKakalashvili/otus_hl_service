@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -14,9 +15,6 @@ class BaseController:
         model: str,
         data: dict,
     ) -> int:
-        # INSERT INTO public."user"
-        # ("name", sur_name, birth_date, sex, city, interest, id)
-        # VALUES('Иван', 'Иванов', '2000-01-01', NULL, 'Sarov', 'cats, pets, football', 1);
         if isinstance(data, dict) and data:
             query = (
                 f"INSERT INTO {model} ("
@@ -25,7 +23,13 @@ class BaseController:
                 + ", ".join("'" + str(value) + "'" for value in data.values())
                 + ") RETURNING id"
             )
-            item = await session.execute(text(query))
+            try:
+                item = await session.execute(text(query))
+            except IntegrityError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=e.args[0],
+                )
         return list(item)[0][0]
 
     @staticmethod
@@ -57,9 +61,12 @@ class BaseController:
         data: dict,
         detail_by_not_fount: str = "Not found.",
     ) -> list[object]:
+        data = {k: v for k, v in data.items() if v}
         query = query = f"SELECT * FROM {model} WHERE " + " AND ".join(
             f"{key} ilike '{str(value)}%'" for key, value in data.items()
         )
         items = await session.execute(text(query))
         items = items.all()
-        return items if len(items) > 1 else []
+        # items
+        # return items if len(items) > 1 else []
+        return items

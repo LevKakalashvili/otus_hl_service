@@ -30,7 +30,6 @@ def upgrade() -> None:
     sa.Column('interest', sa.String(length=255), nullable=True, comment='Интересы пользователя'),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False, comment='Уникальный идентификатор объекта'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
     )
     op.create_index(op.f('ix_user_id'), 'user', ['id'], unique=False)
     # ### end Alembic commands ###

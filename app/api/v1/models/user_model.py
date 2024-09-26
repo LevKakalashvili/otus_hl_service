@@ -16,6 +16,7 @@ class UserModel(BaseModel):
     sex: SexEnum | None
     city: str | None
     interest: str | None
+    password: str | None
 
     class Config:
         from_attributes = True
@@ -37,10 +38,15 @@ class UserCreateRequestModel(BaseModel):
     sex: SexEnum | None = Field(default=None)
     city: str | None = Field(default=None)
     interest: str | None = Field(default=None)
+    password: str | None = Field(default=None)
 
     @field_serializer("sex")
     def serialize_group(self, sex: sex, _info):
         return sex.name.lower()
+
+    @field_serializer("password")
+    def serialize_group(self, password: password, _info):
+        return password.name.lower()
 
 
 class UserResponseModel(UserModel):

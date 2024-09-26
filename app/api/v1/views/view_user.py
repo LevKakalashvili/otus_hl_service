@@ -17,6 +17,23 @@ user_router = APIRouter(
 )
 
 
+@user_router.post(
+    "/login",
+    responses=NotFoundResponse,
+    summary="Регистрация пользователя",
+)
+async def login_user() -> dict:
+#     info: Annotated[
+#         UserModel,
+#         Depends(UserController.get_user_info),
+#     ]
+# ) -> UserResponseModel:
+#     response = UserResponseModel.model_validate(info)
+#     return response
+    # TODO: дописать регистрацию
+    return {}
+
+
 @user_router.get(
     "/search",
     responses=NotFoundResponse,

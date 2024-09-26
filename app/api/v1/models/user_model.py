@@ -16,7 +16,7 @@ class UserModel(BaseModel):
     sex: SexEnum | None
     city: str | None
     interest: str | None
-    password: str | None
+    # password: str | None
 
     class Config:
         from_attributes = True

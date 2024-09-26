@@ -48,9 +48,9 @@ class BaseController:
 
     @staticmethod
     async def get_all(
-        session: AsyncSession, model: str, detail_by_not_fount: str = "Not found."
+        session: AsyncSession, model: str, detail_by_not_fount: str = "Not found.", field_sort: str = "id"
     ) -> list[object]:
-        items = await session.execute(text(f"SELECT * FROM {model}"))
+        items = await session.execute(text(f"SELECT * FROM {model} ORDER BY {field_sort} DESC"))
         items = items.all()
         return items if len(items) > 1 else []
 

@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "3400575c-c651-4819-92f5-cfdf101c5b43",
+		"name": "OTUS socialnetwork",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13625190"
+	},
+	"item": [
+		{
+			"name": "Пользователи",
+			"item": [
+				{
+					"name": "Создать пользователя",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Федор11\",\r\n  \"sur_name\": \"Ивнов\",\r\n  \"birth_date\": \"2000-09-26\",\r\n  \"sex\": \"male\",\r\n  \"city\": \"Москва\",\r\n  \"interest\": \"животные, спорт, рыбалка\",\r\n  \"password\": \"qweqweqwre\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Федор\",\r\n  \"password\": \"qweqweqwre\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/user/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить всех пользователей",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Получить пользователя по id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/:id",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Поиск пользователя",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/user/search?name=ива&sur_name=ива",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"user",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ива"
+								},
+								{
+									"key": "sur_name",
+									"value": "ива"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

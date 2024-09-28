@@ -16,12 +16,14 @@ class UserController(BaseController):
     async def search_users_info(
         user_info: UserSearchRequestModel = Depends(),
         session: AsyncSession = Depends(get_session),
+        pagination: BasePaginationParams = Depends(),
     ) -> list[UserModel]:
         """Метод поиск пользователей"""
         info = await UserController.search(
             session=session,
             model=UserController.model,
             data=user_info.model_dump(exclude_none=True),
+            pagination=pagination,
         )
         return [UserModel.model_validate(element) for element in info]
 

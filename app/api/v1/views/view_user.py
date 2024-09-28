@@ -23,13 +23,13 @@ user_router = APIRouter(
     summary="Регистрация пользователя",
 )
 async def login_user() -> dict:
-#     info: Annotated[
-#         UserModel,
-#         Depends(UserController.get_user_info),
-#     ]
-# ) -> UserResponseModel:
-#     response = UserResponseModel.model_validate(info)
-#     return response
+    #     info: Annotated[
+    #         UserModel,
+    #         Depends(UserController.get_user_info),
+    #     ]
+    # ) -> UserResponseModel:
+    #     response = UserResponseModel.model_validate(info)
+    #     return response
     # TODO: дописать регистрацию
     return {}
 

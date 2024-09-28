@@ -1,7 +1,7 @@
 # Social Network Backend
 > "Сервис социальной сети для учебного проекта"
 > 
-> ## Установка и запуск (локально)
+## Установка и запуск (локально)
 Необходимо иметь `python==^3.11`, `poetry`, и `postgresql`
 
 ### Клонирование
@@ -41,6 +41,5 @@ poetry run python main.py
 ## Установка и запуск (контейнеризация)
 ### Docker
 ```shell
-docker build -t social_network_backend .
-docker run -p PORT:PORT social_network_backend
+docker-compose --env-file docker-compose.env -f docker-compose.yml -p otus_hl_service up -d
 ```

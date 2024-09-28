@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.models import UserCreateRequestModel, UserModel
 from app.api.v1.models.user_model import UserSearchRequestModel
 from app.core.based import BaseController
+from app.core.models.common import BasePaginationParams
 from app.database.db import get_session
 from app.database.models import User
 
@@ -49,7 +50,10 @@ class UserController(BaseController):
     @staticmethod
     async def get_all_users_info(
         session: AsyncSession = Depends(get_session),
+        pagination: BasePaginationParams = Depends(),
     ) -> list[UserModel]:
         """Метод получения информации о всех пользователях"""
-        info = await UserController.get_all(session=session, model=UserController.model)
+        info = await UserController.get_all(
+            session=session, model=UserController.model, pagination=pagination
+        )
         return [UserModel.model_validate(element) for element in info]

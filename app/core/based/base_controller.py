@@ -3,6 +3,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.models.common import BasePaginationParams
+
 
 class BaseController:
     """
@@ -48,9 +50,16 @@ class BaseController:
 
     @staticmethod
     async def get_all(
-        session: AsyncSession, model: str, detail_by_not_fount: str = "Not found.", field_sort: str = "id"
+        session: AsyncSession,
+        model: str,
+        detail_by_not_fount: str = "Not found.",
+        field_sort: str = "id",
+        pagination: BasePaginationParams = None,
     ) -> list[object]:
-        items = await session.execute(text(f"SELECT * FROM {model} ORDER BY {field_sort} DESC"))
+        query: str = f"SELECT * FROM {model} ORDER BY {field_sort}"
+        if pagination:
+            query = pagination.add_pagination(query=query)
+        items = await session.execute(text(query))
         items = items.all()
         return items if len(items) > 1 else []
 
@@ -60,11 +69,14 @@ class BaseController:
         model: str,
         data: dict,
         detail_by_not_fount: str = "Not found.",
+        pagination: BasePaginationParams = None,
     ) -> list[object]:
         data = {k: v for k, v in data.items() if v}
         query = query = f"SELECT * FROM {model} WHERE " + " AND ".join(
             f"{key} ilike '{str(value)}%'" for key, value in data.items()
         )
+        if pagination:
+            query = pagination.add_pagination(query=query)
         items = await session.execute(text(query))
         items = items.all()
         # items

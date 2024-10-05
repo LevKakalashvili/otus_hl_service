@@ -9,6 +9,7 @@ class ApplicationSettings(BaseSettings):
     SERVICE: str = Field(default="social_network_backend")
 
     LOGGING_LEVEL: str = Field(default="DUBUG")
+    LOG_FILE: str = Field(default="./logs/app.log")
 
     SERVER_HOST: str = Field(default="0.0.0.0")
     SERVER_PORT: int = Field(default="8000")

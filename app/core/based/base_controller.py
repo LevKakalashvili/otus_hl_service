@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from loguru import logger
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +26,7 @@ class BaseController:
                 + ", ".join("'" + str(value) + "'" for value in data.values())
                 + ") RETURNING id"
             )
+            logger.debug(query)
             try:
                 item = await session.execute(text(query))
             except IntegrityError as e:
@@ -41,7 +43,9 @@ class BaseController:
         id_: int,
         detail_by_not_fount: str = "Not found.",
     ) -> object:
-        item = await session.execute(text(f"SELECT * FROM {model} WHERE id={id_}"))
+        query = f"SELECT * FROM {model} WHERE id={id_}"
+        logger.debug(query)
+        item = await session.execute(text(query))
         if not (item := item.first()):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=detail_by_not_fount
@@ -59,6 +63,7 @@ class BaseController:
         query: str = f"SELECT * FROM {model} ORDER BY {field_sort}"
         if pagination:
             query = pagination.add_pagination(query=query)
+        logger.debug(query)
         items = await session.execute(text(query))
         items = items.all()
         return items if len(items) > 1 else []
@@ -77,8 +82,7 @@ class BaseController:
         )
         if pagination:
             query = pagination.add_pagination(query=query)
+        logger.debug(query)
         items = await session.execute(text(query))
         items = items.all()
-        # items
-        # return items if len(items) > 1 else []
         return items

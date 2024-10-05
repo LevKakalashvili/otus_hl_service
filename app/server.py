@@ -1,22 +1,9 @@
-from uuid import uuid4
-
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.v1 import health_check_router, user_router
-from app.core.monitoring.logger import configure_logging
 from app.core.settings import Settings, settings
 from app.handlers import exception_handler
-from app.middlewares import LoggingMiddleware
-
-# configure logger
-if settings.ENVIRONMENT in ("dev", "prod", "stage"):
-    configure_logging(
-        level=settings.LOGGING_LEVEL,
-        service=settings.SERVICE,
-        environment=settings.ENVIRONMENT,
-        instance=str(uuid4()),
-    )
 
 
 class Server:
@@ -33,7 +20,6 @@ class Server:
             allow_methods=["GET", "POST", "PUT", "PATCH", "HEAD", "OPTIONS", "DELETE"],
             allow_headers=["*"],
         )
-        self.app.add_middleware(LoggingMiddleware)
 
     def _add_exception_handlers(self):
         """Добавление обработчиков исключений"""

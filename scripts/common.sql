@@ -1,3 +1,33 @@
 select u.id, u.* from "user" u order by id DESC
 
 TRUNCATE TABLE public.user;
+
+SELECT * FROM "user" order by id LIMIT 100 OFFSET 0
+
+select COUNT(distinct name) from "user"
+
+select COUNT(distinct sur_name) from "user"  
+
+select count(8) from "user" u
+
+
+CREATE INDEX user_name_idx ON public."user" ("name");
+drop index user_name_idx;
+
+CREATE INDEX user_sur_name_idx ON public."user" ("sur_name");
+drop index user_sur_name_idx;
+
+CREATE INDEX user_sur_name_name_idx ON public."user" ("name", "sur_name");
+drop index user_sur_name_name_idx;
+
+explain analyze
+select * from public.user
+where "name" like 'Авгу%' and sur_name like 'Абра%';
+
+explain analyze
+select * from public.user
+where "name" like 'Авгу%';
+
+
+select * from public.user
+where "name" ilike 'Авгу%' and sur_name ilike 'Абра%';

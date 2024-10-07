@@ -78,7 +78,7 @@ class BaseController:
     ) -> list[object]:
         data = {k: v for k, v in data.items() if v}
         query = query = f"SELECT * FROM {model} WHERE " + " AND ".join(
-            f"{key} ilike '{str(value)}%'" for key, value in data.items()
+            f"{key} like '{str(value).lower()}%'" for key, value in data.items()
         )
         if pagination:
             query = pagination.add_pagination(query=query)

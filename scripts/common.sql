@@ -30,8 +30,8 @@ where "name" ilike 'Авгу%' and sur_name ilike 'Абра%';
 
 explain analyze
 select * from public.user
-where "name" like lower('Авгу%') and sur_name like lower('Абра%');
--- where "name" like '%Авгу%' and sur_name like '%Абра%'; -- работает медленно
+-- where "name" like lower('Авгу%') and sur_name like lower('Абра%');
+where "name" like lower('%Авгу%') and sur_name like lower('%Абра%'); -- работает медленно
 
 explain analyze
 select * from public.user

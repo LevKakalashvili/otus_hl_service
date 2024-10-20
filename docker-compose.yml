@@ -1,63 +1,45 @@
-version: '3.1'
-
+version: '3.9'
 
 services:
-  db:
-    container_name: social_network_db
+  db_master:
     image: postgres:latest
+    env_file:
+      - ./docker-compose.env
+    container_name: master_social_network_db
+    hostname: master_social_network_db
+    restart: on-failure
     ports:
-        - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    environment:
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_DB: ${POSTGRES_DB}
-    restart: always
-    volumes:
-      - ./scripts:/docker-entrypoint-initdb.d postgres
-      - ./data/postgres:/var/lib/postgresql/data
-
-  migrator:
-    container_name: migrator
-    command: ["sh", "-c", "alembic upgrade head"]
-    depends_on:
-      - db
-    build:
-      dockerfile: _app.Dockerfile
-      context: .
-    environment:
-      DB_URI: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
-
-  data_loader:
-    container_name: data_loader
-    build:
-      dockerfile: _load_data.Dockerfile
-      context: .
-    depends_on:
-      - db
-      - migrator
+      - "${POSTGRES_MASTER_PORT}:${POSTGRES_PORT}"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-
-  service_online:
-    container_name: social_network_app
-    image: social_network_app:dev
-    build:
-      dockerfile: _app.Dockerfile
-      context: .
-    restart: always
-    ports:
-      - "81:8000"
     volumes:
-      - ./scripts:/docker-entrypoint-initdb.d postgres
-      - ./logs:/app/logs
-    command: [ "uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8000" ]
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ./data/postgres_master:/var/lib/postgresql/data
+      - ./scripts/postgres_config/master/init-master.sh:/docker-entrypoint-initdb.d/1_init-master.sh
     healthcheck:
-      test: curl -sS http://127.0.0.1:8000 || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 3
+      test: [ "CMD-SHELL", "pg_isready -U admin -d postgres" ]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+
+
+  db_slave_1:
+    image: postgres:latest
+    env_file:
+      - ./docker-compose.env
+    container_name: slave_social_network_db
+    hostname: slave_1_social_network_db
+    ports:
+      - "${POSTGRES_SLAVE_1_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: on-failure
+    volumes:
+      - ./data/postgres_slave_1:/var/lib/postgresql/data
+      - ./scripts/postgres_config/slave/init-slave.sh:/docker-entrypoint-initdb.d/1_init-slave.sh
+    depends_on:
+      db_master:
+        condition: service_healthy

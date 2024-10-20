@@ -28,7 +28,7 @@ services:
     image: postgres:latest
     env_file:
       - ./docker-compose.env
-    container_name: slave_social_network_db
+    container_name: slave_1_social_network_db
     hostname: slave_1_social_network_db
     ports:
       - "${POSTGRES_SLAVE_1_PORT}:${POSTGRES_PORT}"
@@ -39,6 +39,26 @@ services:
     restart: on-failure
     volumes:
       - ./data/postgres_slave_1:/var/lib/postgresql/data
+      - ./scripts/postgres_config/slave/init-slave.sh:/docker-entrypoint-initdb.d/1_init-slave.sh
+    depends_on:
+      db_master:
+        condition: service_healthy
+
+  db_slave_2:
+    image: postgres:latest
+    env_file:
+      - ./docker-compose.env
+    container_name: slave_2_social_network_db
+    hostname: slave_2_social_network_db
+    ports:
+      - "${POSTGRES_SLAVE_2_PORT}:${POSTGRES_PORT}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    restart: on-failure
+    volumes:
+      - ./data/postgres_slave_2:/var/lib/postgresql/data
       - ./scripts/postgres_config/slave/init-slave.sh:/docker-entrypoint-initdb.d/1_init-slave.sh
     depends_on:
       db_master:

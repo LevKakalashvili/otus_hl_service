@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import HTTPException, status
 from loguru import logger
 from sqlalchemy import text
@@ -5,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.models.common import BasePaginationParams
+from app.core.settings import settings
 
 
 class BaseController:
@@ -14,7 +17,7 @@ class BaseController:
 
     @staticmethod
     async def create(
-        session: AsyncSession,
+        sessions: List[AsyncSession],
         model: str,
         data: dict,
     ) -> int:
@@ -28,6 +31,8 @@ class BaseController:
             )
             logger.debug(query)
             try:
+                session = sessions[settings.DB_MASTER_INDEX]
+                logger.debug(str(session.bind.url))
                 item = await session.execute(text(query))
             except IntegrityError as e:
                 raise HTTPException(
@@ -38,13 +43,15 @@ class BaseController:
 
     @staticmethod
     async def get_by_id(
-        session: AsyncSession,
+        sessions: List[AsyncSession],
         model: str,
         id_: int,
         detail_by_not_fount: str = "Not found.",
     ) -> object:
         query = f"SELECT * FROM {model} WHERE id={id_}"
         logger.debug(query)
+        session = sessions[settings.get_actual_slave_index()]
+        logger.debug(str(session.bind.url))
         item = await session.execute(text(query))
         if not (item := item.first()):
             raise HTTPException(
@@ -54,7 +61,7 @@ class BaseController:
 
     @staticmethod
     async def get_all(
-        session: AsyncSession,
+        sessions: List[AsyncSession],
         model: str,
         detail_by_not_fount: str = "Not found.",
         field_sort: str = "id",
@@ -64,13 +71,15 @@ class BaseController:
         if pagination:
             query = pagination.add_pagination(query=query)
         logger.debug(query)
+        session = sessions[settings.get_actual_slave_index()]
+        logger.debug(str(session.bind.url))
         items = await session.execute(text(query))
         items = items.all()
         return items if len(items) > 1 else []
 
     @staticmethod
     async def search(
-        session: AsyncSession,
+        sessions: List[AsyncSession],
         model: str,
         data: dict,
         detail_by_not_fount: str = "Not found.",
@@ -83,6 +92,8 @@ class BaseController:
         if pagination:
             query = pagination.add_pagination(query=query)
         logger.debug(query)
+        session = sessions[settings.get_actual_slave_index()]
+        logger.debug(str(session.bind.url))
         items = await session.execute(text(query))
         items = items.all()
         return items

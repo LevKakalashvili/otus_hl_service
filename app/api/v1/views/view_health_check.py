@@ -1,5 +1,5 @@
 import datetime
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,9 +37,9 @@ def liveness(settings: Settings) -> Any:
     "/checks/readiness",
     summary="Метод выполняет обращения в подсистемы, с которыми работает",
 )
-async def readiness(session: AsyncSession = Depends(get_session)) -> Any:
+async def readiness(sessions: List[AsyncSession] = Depends(get_session)) -> Any:
     try:
-        statistics_ms = await session.scalar(text("SELECT version()"))
+        statistics_ms = await sessions[0].scalar(text("SELECT version()"))
         return {
             "Status": HTTP_200_OK,
             "DB version": statistics_ms,
